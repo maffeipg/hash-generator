@@ -1,6 +1,9 @@
 <script lang="ts">
   import OutputCard from "./OutputCard.svelte";
   import Toast from "./Toast.svelte";
+  import * as Card from "$components/ui/card";
+  import * as Select from "$components/ui/select";
+  import { Textarea } from "$components/ui/textarea";
   import {
     copyToClipboard,
     countCharacters,
@@ -87,29 +90,36 @@
   }
 </script>
 
-<section class="layout-card" aria-label="Hash generator form">
-  <div class="control-panel">
-    <label class="field-label" for="algorithm">Algorithm</label>
-    <select
-      id="algorithm"
-      bind:value={algorithm}
-      aria-label="Select hash algorithm"
+<Card.Root class="grid gap-5 p-4 md:grid-cols-2 md:p-5">
+  <div class="grid gap-4">
+    <div class="space-y-2">
+      <label class="text-sm font-medium" for="algorithm">Algorithm</label>
+      <Select.Root type="single" bind:value={algorithm}>
+        <Select.Trigger id="algorithm" class="w-full">
+          <span>{algorithm}</span>
+        </Select.Trigger>
+        <Select.Content>
+          {#each SUPPORTED_ALGORITHMS as item}
+            <Select.Item value={item} label={item}>{item}</Select.Item>
+          {/each}
+        </Select.Content>
+      </Select.Root>
+    </div>
+
+    <div class="space-y-2">
+      <label class="text-sm font-medium" for="input-text">Input text</label>
+      <Textarea
+        id="input-text"
+        bind:value={text}
+        placeholder="Type or paste text here..."
+        class="min-h-[14rem] md:min-h-[16rem]"
+        aria-describedby="character-count"
+      />
+    </div>
+
+    <div
+      class="flex items-center justify-between gap-3 text-sm text-muted-foreground"
     >
-      {#each SUPPORTED_ALGORITHMS as item}
-        <option value={item}>{item}</option>
-      {/each}
-    </select>
-
-    <label class="field-label" for="input-text">Input text</label>
-    <textarea
-      id="input-text"
-      bind:value={text}
-      placeholder="Type or paste text here..."
-      rows="10"
-      aria-describedby="character-count"
-    ></textarea>
-
-    <div class="meta-row">
       <p id="character-count">Characters: {countCharacters(text)}</p>
       <p>UTF-8 encoded in the browser</p>
     </div>
@@ -123,102 +133,6 @@
     onCopy={handleCopy}
     onClear={handleClear}
   />
-</section>
+</Card.Root>
 
 <Toast visible={copyToastVisible} message="Hash copied to clipboard" />
-
-<style>
-  .layout-card {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 2rem;
-    align-items: start;
-    padding: 1rem;
-    background: #ffffff;
-    border: 1px solid #dbe6f0;
-    border-radius: 1.25rem;
-    box-shadow: 0 12px 35px rgba(15, 23, 42, 0.06);
-  }
-
-  .control-panel {
-    display: grid;
-    align-content: start;
-    gap: 0.75rem;
-    padding: 0.1rem 0;
-    max-width: 26rem;
-  }
-
-  .field-label {
-    display: block;
-    font-size: 0.92rem;
-    font-weight: 700;
-    color: #0f172a;
-  }
-
-  select,
-  textarea {
-    width: 100%;
-    max-width: 27rem;
-    border: 1px solid #bfd0df;
-    border-radius: 0.9rem;
-    padding: 0.9rem 1rem;
-    font: inherit;
-    font-size: 0.96rem;
-    line-height: 1.5;
-    background: #f8fafc;
-    color: #0f172a;
-    transition:
-      border-color 140ms ease,
-      box-shadow 140ms ease,
-      background-color 140ms ease;
-  }
-
-  select {
-    width: 100%;
-    height: 3rem;
-    min-height: 3rem;
-  }
-
-  textarea {
-    width: 100%;
-    resize: vertical;
-    height: 12rem;
-    min-height: 12rem;
-    font-family: inherit;
-  }
-
-  select:focus,
-  textarea:focus {
-    outline: none;
-    border-color: #0ea5e9;
-    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
-    background: #ffffff;
-  }
-
-  .meta-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.5rem 1rem;
-    flex-wrap: wrap;
-    color: #64748b;
-    font-size: 0.9rem;
-    margin-top: 0.2rem;
-  }
-
-  .meta-row p {
-    margin: 0;
-  }
-
-  @media (max-width: 820px) {
-    .layout-card {
-      grid-template-columns: 1fr;
-      gap: 1rem;
-    }
-
-    textarea {
-      height: 14rem;
-      min-height: 14rem;
-    }
-  }
-</style>
